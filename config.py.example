@@ -1,0 +1,14 @@
+# 请填入你的币安统一账户，目前只支持统一账户 
+accounts = [{
+  "remark": "我的No.1账户",
+  "apiKey": "gSKrherW1x7jszkBweXt1wSylm",
+  "secret": "FJ5ekxF9fge7PTZg"
+},{
+  "remark": "我的No.2账户",
+  "apiKey": "gSKrherW1x7jszkBweXt1wSylm",
+  "secret": "FJ5ekxF9fge7PTZg"
+},{
+  "remark": "我的No.3账户",
+  "apiKey": "gSKrherW1x7jszkBweXt1wSylm",
+  "secret": "FJ5ekxF9fge7PTZg"
+}]

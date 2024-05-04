@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import os
 
 
-bucket = 'mybucket'
+bucket = os.environ.get('DOCKER_INFLUXDB_INIT_BUCKET')
 
 def printEnv():
     # 获取所有环境变量
