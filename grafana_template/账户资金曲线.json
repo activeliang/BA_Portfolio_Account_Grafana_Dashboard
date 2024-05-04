@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 4,
   "links": [],
   "panels": [
     {
@@ -274,7 +274,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 31,
+        "h": 17,
         "w": 24,
         "x": 0,
         "y": 5
@@ -350,6 +350,6 @@
   "timezone": "browser",
   "title": "账户资金曲线",
   "uid": "ddk3f4sle8i68f",
-  "version": 15,
+  "version": 2,
   "weekStart": ""
 }
