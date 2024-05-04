@@ -1,7 +1,7 @@
 这是一个docker上运行的基于grafana+influxdb的仪表盘。主要用来显示币安统一账户的资金曲线、最后下单时间。当然你也可以添加监控警报。
 
 
-部署及使用方法：
+### 部署及使用方法：
 1. 克隆本仓库
 2. 复制config.py.example并重命名去掉末尾的.example，然后配置里边的账号列表信息，
 3. 复制vars.env.example并重命名去掉末尾的.example，里边的数据库连接信息
@@ -30,6 +30,26 @@
 
 
 
-代码更新：
-- 日后若本仓库更新，如果更新部署，你只需要拉取最新代码，然后执行`docker-compose down && docker-compose up -d  --build`即可。（这个指令先停止docker-compose并重构并重启）
+### 代码更新：
+- 日后若本仓库更新，如果更新部署，你只需要拉取最新代码，然后执行`docker-compose down && docker-compose up -d  --build`即可。（这个指令会先停止docker-compose并重构镜像并重启）
 
+
+### 关于docker-compose的一些常用方法：
+> 以下指令需要在项目根目录下执行。
+
+- 检查容器状态：
+  - `docker ps`
+
+- 启动docker-comopose:
+  - `docker-compose up` 前台启动，临时启动
+  - `docker-compose up -d` 后台启动版本
+
+- 进入容器内部： 
+  - `docker-compose exec python-cron bash` （针对已经启动容器）
+  - `docker-compose run python-cron bash`  （针对未启动容器)
+
+- 查看docker-compose运行日志
+  - `docker-compose logs -f`
+
+- 停止docker-compose:
+  - `docker-compose down`
