@@ -24,7 +24,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "bdk35ey8im41sf"
+        "uid": ""
       },
       "fieldConfig": {
         "defaults": {
@@ -185,7 +185,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "bdk35ey8im41sf"
+            "uid": ""
           },
           "query": "from(bucket: \"mybucket\")\n|> range(start: -24h)\n|> filter(fn: (r) => r._measurement == \"account_metrics\")\n|> filter(fn: (r) => r._field == \"balance\") // 仅选择balance字段进行操作\n|> group(columns: [\"account_id\"])\n|> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n|> difference(columns: [\"balance\"])\n|> group() // 重新分组，以便累加所有账户的变化\n|> sum(column: \"balance\") // 对变化量进行累加",
           "refId": "A"
@@ -204,7 +204,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "bdk35ey8im41sf"
+            "uid": ""
           },
           "hide": false,
           "query": "\n// 最近的总资产\nfrom(bucket: \"mybucket\")\n  |> range(start: -24h)\n  |> filter(fn: (r) => r._measurement == \"account_metrics\" and r._field == \"balance\")\n  |> group(columns: [\"account_id\"])\n  |> last()\n  |> sum()",
@@ -216,7 +216,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "bdk35ey8im41sf"
+        "uid": ""
       },
       "fieldConfig": {
         "defaults": {
@@ -301,7 +301,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "bdk35ey8im41sf"
+            "uid": ""
           },
           "query": "import \"strings\"\nfrom(bucket: \"mybucket\") |> range(start: -1y) |> filter(fn: (r) => r._measurement == \"account_metrics\" and r._field == \"balance\") |> filter(fn: (r) => strings.containsStr(v: \"$account_list\", substr: r.account_id))\n\n",
           "refId": "A"
@@ -324,7 +324,7 @@
         },
         "datasource": {
           "type": "influxdb",
-          "uid": "bdk35ey8im41sf"
+          "uid": ""
         },
         "definition": "from(bucket: \"mybucket\")\n  |> range(start: -1)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"account_ids\")\n  |> last()",
         "hide": 1,

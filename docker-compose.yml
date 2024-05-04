@@ -21,7 +21,7 @@ services:
     volumes:
       - influxdb-storage:/var/lib/influxdb
     env_file: 
-      - db.env
+      - vars.env
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -34,7 +34,7 @@ services:
       - /etc/localtime:/etc/localtime:ro  # 确保容器使用正确的时区
       - .:/app
     env_file:
-      - db.env
+      - vars.env
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"

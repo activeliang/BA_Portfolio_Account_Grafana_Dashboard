@@ -4,7 +4,7 @@ touch /var/log/cron.log
 
 cat >/app/docker/cron_task.sh<<EOF
 #!/bin/bash
-export \$(cat /app/db.env | xargs)
+export \$(cat /app/vars.env | xargs)
 /usr/local/bin/python /app/main.py >> /var/log/cron.log 2>&1
 EOF
 
