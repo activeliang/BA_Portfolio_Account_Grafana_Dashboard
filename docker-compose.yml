@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  influxdb:
+    image: influxdb:2.0.5
+    container_name: influxdb
+    restart: unless-stopped
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb-storage:/var/lib/influxdb
+    env_file: 
+      - db.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  python-cron:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    container_name: python-cron
+    volumes:
+      - /etc/localtime:/etc/localtime:ro  # 确保容器使用正确的时区
+      - .:/app
+    env_file:
+      - db.env
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  grafana-storage: {}
+  influxdb-storage: {}

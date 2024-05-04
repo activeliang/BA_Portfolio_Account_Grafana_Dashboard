@@ -1,0 +1,5 @@
+config.py
+*.env
+dev.py
+**/__pycache__
+**/.idea

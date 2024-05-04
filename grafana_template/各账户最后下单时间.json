@@ -1,0 +1,351 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 2,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "bdk35ey8im41sf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "fieldMinMax": true,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "更新时间"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 193
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "最近24h盈亏率"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "suffix: %"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 0,
+                      "result": {
+                        "color": "green",
+                        "index": 0
+                      },
+                      "to": 999
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 0,
+                      "result": {
+                        "color": "red",
+                        "index": 1
+                      },
+                      "to": 999
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*交易时间$/"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 0,
+                      "result": {
+                        "color": "green",
+                        "index": 0
+                      },
+                      "to": 2
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 2,
+                      "result": {
+                        "color": "yellow",
+                        "index": 1
+                      },
+                      "to": 4
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 4,
+                      "result": {
+                        "color": "red",
+                        "index": 2
+                      },
+                      "to": 999999
+                    },
+                    "type": "range"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "unit",
+                "value": "suffix: 小时前"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*盈亏$/"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "from": 0,
+                      "result": {
+                        "color": "green",
+                        "index": 0
+                      },
+                      "to": 99999999
+                    },
+                    "type": "range"
+                  },
+                  {
+                    "options": {
+                      "from": 0,
+                      "result": {
+                        "color": "red",
+                        "index": 1
+                      },
+                      "to": -99999999
+                    },
+                    "type": "range"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 31,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "md",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": [
+            "last_balance",
+            "balance_changed"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "frameIndex": 0,
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "bdk35ey8im41sf"
+          },
+          "query": "import \"math\"\nimport \"strings\"\nfrom(bucket: \"mybucket\")\n  |> range(start: -14d)\n  |> filter(fn: (r) => r._measurement == \"account_metrics\")\n  |> filter(fn: (r) => strings.containsStr(v: \"$account_list\", substr: r.account_id))\n  |> filter(fn: (r) => \n      r._field == \"account_name\" or \n      r._field == \"account_id\" or \n      r._field == \"f_last_order_time\" or \n      r._field == \"d_last_order_time\" or \n      r._field == \"s_last_order_time\" or\n      r._field == \"balance\"\n  )\n\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> group(columns: [\"account_name\"])\n\n// 计算最后一个订单时间距现在的小时数\n|> map(fn: (r) => {\n    return {\n      r with\n      f_last_order_time_hours: float(v: int(v: now()) - int(v: r.f_last_order_time)) / 1000000000.0 / 3600.0,\n      d_last_order_time_hours: float(v: int(v: now()) - int(v: r.d_last_order_time)) / 1000000000.0 / 3600.0,\n      s_last_order_time_hours: float(v: int(v: now()) - int(v: r.s_last_order_time)) / 1000000000.0 / 3600.0,\n    }\n  })\n\n|> duplicate(column: \"balance\", as: \"last_balance\")\n\n\n// 计算24小时内balance的变化百分比\n|> derivative(unit: 24h, nonNegative: false, columns: [\"balance\"])\n|> duplicate(column: \"balance\", as: \"balance_changed\")\n\n|> map(fn: (r) => {\n    return {\n      r with\n      balance_change_percent:  math.round(x: (r.balance_changed / r.last_balance * 10000.0)) / 100.0\n    }\n  })\n|> last(column: \"f_last_order_time\")\n\n|> group(columns: [])",
+          "refId": "A"
+        }
+      ],
+      "title": "各账户最后交易时间",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "_measurement": true,
+              "_start": true,
+              "_stop": true,
+              "account_id": true,
+              "balance": true,
+              "balance_changed": false,
+              "f_last_order_time": true,
+              "last_balance": false,
+              "s_last_order_time": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "_measurement": 3,
+              "_start": 0,
+              "_stop": 1,
+              "_time": 2,
+              "account_id": 4,
+              "account_name": 5,
+              "balance": 6,
+              "balance_change_percent": 13,
+              "balance_changed": 12,
+              "d_last_order_time_hours": 7,
+              "f_last_order_time": 8,
+              "f_last_order_time_hours": 9,
+              "last_balance": 14,
+              "s_last_order_time": 10,
+              "s_last_order_time_hours": 11
+            },
+            "renameByName": {
+              "_measurement": "",
+              "_start": "",
+              "_time": "更新时间",
+              "account_name": "账户名",
+              "balance": "总资产",
+              "balance_change_percent": "最近24h盈亏率",
+              "balance_changed": "最近24h盈亏",
+              "d_last_order_time_hours": "币位最近交易时间",
+              "f_last_order_time_hours": "U本位最近交易时间",
+              "last_balance": "总资产",
+              "s_last_order_time_hours": "杠杆账户最近交易时间"
+            }
+          }
+        },
+        {
+          "id": "formatTime",
+          "options": {
+            "outputFormat": "MM:DD HH:mm:ss",
+            "timeField": "更新时间",
+            "timezone": "browser",
+            "useTimezone": true
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "table"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "879225225-879225225-879225225",
+          "value": "879225225-879225225-879225225"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "bdk35ey8im41sf"
+        },
+        "definition": "from(bucket: \"mybucket\")\n  |> range(start: -1)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"account_ids\")\n  |> last()",
+        "hide": 1,
+        "includeAll": false,
+        "label": "账户列表",
+        "multi": false,
+        "name": "account_list",
+        "options": [],
+        "query": "from(bucket: \"mybucket\")\n  |> range(start: -1)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"account_ids\")\n  |> last()",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "各账户最后下单时间",
+  "uid": "ddk3f4sl2k4mwf",
+  "version": 6,
+  "weekStart": ""
+}
