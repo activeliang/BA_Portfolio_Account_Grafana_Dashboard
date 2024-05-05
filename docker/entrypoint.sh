@@ -10,11 +10,12 @@ EOF
 
 chmod +x /app/docker/cron_task.sh
 
-# 创建一个 cron 任务，每5分钟执行一次 Python 脚本
+# 创建一个 cron 任务
+crontab -r
 (crontab -l 2>/dev/null; echo "${CRONTAB_SCHEDULE} /app/docker/cron_task.sh") | crontab -
 
 # 启动 cron 服务
-cron
+# cron
 
 # 保持容器运行
 tail -f /var/log/cron.log

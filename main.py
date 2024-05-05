@@ -17,6 +17,31 @@ def printEnv():
     for key, value in env_vars.items():
         print(f"{key}: {value}")
 
+def getLastPresentValue(account_id, column):
+    # 构建查询语句
+    query = f'''
+        from(bucket: "{bucket}")
+            |> range(start: -1y)
+            |> filter(fn: (r) => r["_measurement"] == "account_metrics")
+            |> filter(fn: (r) => r["_field"] == "{column}" or r["_field"] == "account_id")
+            |> filter(fn: (r) => exists r._value)
+            |> filter(fn: (r) => r["account_id"] == "{account_id}")  // 确保 account_id 值正确
+            |> group(columns: [])
+            |> last()
+    '''
+
+    # 执行查询
+    with influxdb_client() as (query_api, write_api, Point):
+        result = query_api.query(query=query)
+
+    print(result)
+
+    # 处理查询结果
+    for table in result:
+        for row in table.records:
+            print(f"Last {column} for account_id {account_id}: {row.get_value()}")
+            return row.get_value()
+
 def getAccountUid(exchange):
     checksum = exchange.options['checksum']
     # 查询是否存在相同 checksum 的记录
@@ -65,22 +90,24 @@ def render_exchange(account):
 def fetch_data(account):
     exchange = render_exchange(account)
     balance = exchange.papi_get_account()['actualEquity']
-    # 减去5分钟
-    minutes_6_ago = int((datetime.now() - timedelta(minutes=600)).timestamp())*1000
-    f_income_list = exchange.papi_get_um_income({ 'incomeType': 'COMMISSION', 'limit': 1000, 'startTime': minutes_6_ago })
-    f_last_order_time = int(f_income_list[-1]['time'])*1000000 if f_income_list else None
+    account_id = getAccountUid(exchange)
+    # 过去4小时
+    hours_4_ago = int((datetime.now() - timedelta(hours=4)).timestamp()) * 1000
 
-    d_income_list = exchange.papi_get_cm_income({ 'incomeType': 'COMMISSION', 'limit': 1000, 'startTime': minutes_6_ago })
-    d_last_order_time = int(d_income_list[-1]['time'])*1000000 if d_income_list else None
+    f_income_list = exchange.papi_get_um_income({ 'incomeType': 'COMMISSION', 'limit': 1000, 'startTime': hours_4_ago })
+    f_last_order_time = int(f_income_list[-1]['time'])*1000000 if f_income_list else getLastPresentValue(account_id, 'f_last_order_time')
+
+    d_income_list = exchange.papi_get_cm_income({ 'incomeType': 'COMMISSION', 'limit': 1000, 'startTime': hours_4_ago })
+    d_last_order_time = int(d_income_list[-1]['time'])*1000000 if d_income_list else getLastPresentValue(account_id, 'd_last_order_time')
     
-    s_income_list = exchange.sapi_get_margin_capital_flow({ 'type': 'TRADING_COMMISSION', 'limit': 1000, 'startTime': minutes_6_ago })
-    s_last_order_time = int(s_income_list[-1]['timestamp'])*1000000 if s_income_list else None
+    s_income_list = exchange.sapi_get_margin_capital_flow({ 'type': 'TRADING_COMMISSION', 'limit': 1000, 'startTime': hours_4_ago })
+    s_last_order_time = int(s_income_list[-1]['timestamp'])*1000000 if s_income_list else getLastPresentValue(account_id, 's_last_order_time')
     json_body = [
         {
             "measurement": "account_metrics",
             "tags": {
                 "account_name": account['remark'],
-                "account_id": getAccountUid(exchange),
+                "account_id": account_id,
             },
             "time": time.time_ns(),
             "fields": {
