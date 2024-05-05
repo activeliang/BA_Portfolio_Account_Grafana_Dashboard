@@ -8,7 +8,7 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - /var/lib/grafana:/var/lib/grafana
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -19,7 +19,7 @@ services:
     ports:
       - '8086:8086'
     volumes:
-      - influxdb-storage:/var/lib/influxdb
+      - /var/lib/influxdb:/var/lib/influxdb
     env_file: 
       - vars.env
     extra_hosts:
@@ -39,6 +39,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-volumes:
-  grafana-storage: {}
-  influxdb-storage: {}
+# 由于我们已经将 volumes 指向了宿主机的目录，下面的定义可以删除
+# volumes:
+#   grafana-storage: {}
+#   influxdb-storage: {}
