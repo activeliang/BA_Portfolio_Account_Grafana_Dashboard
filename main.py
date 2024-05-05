@@ -34,8 +34,6 @@ def getLastPresentValue(account_id, column):
     with influxdb_client() as (query_api, write_api, Point):
         result = query_api.query(query=query)
 
-    print(result)
-
     # 处理查询结果
     for table in result:
         for row in table.records:

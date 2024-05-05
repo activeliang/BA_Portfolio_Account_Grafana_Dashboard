@@ -4,7 +4,7 @@ touch /var/log/cron.log
 
 cat >/app/docker/cron_task.sh<<EOF
 #!/bin/bash
-export \$(cat /app/vars.env | xargs)
+export \$(grep '^[^CRONTAB]' /app/vars.env | xargs)
 /usr/local/bin/python /app/main.py >> /var/log/cron.log 2>&1
 EOF
 
@@ -12,7 +12,9 @@ chmod +x /app/docker/cron_task.sh
 
 # 创建一个 cron 任务
 crontab -r
-(crontab -l 2>/dev/null; echo "${CRONTAB_SCHEDULE} /app/docker/cron_task.sh") | crontab -
+CURRENT_CRONTAB_SCHEDULE="$(grep '^CRONTAB_SCHEDULE=' /app/vars.env | cut -d '=' -f 2)"
+
+(crontab -l 2>/dev/null; echo -e "${CURRENT_CRONTAB_SCHEDULE} /app/docker/cron_task.sh") | crontab -
 
 # 启动 cron 服务
 # cron
