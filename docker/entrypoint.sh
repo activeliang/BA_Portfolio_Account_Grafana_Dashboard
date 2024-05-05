@@ -17,7 +17,7 @@ CURRENT_CRONTAB_SCHEDULE="$(grep '^CRONTAB_SCHEDULE=' /app/vars.env | cut -d '='
 (crontab -l 2>/dev/null; echo -e "${CURRENT_CRONTAB_SCHEDULE} /app/docker/cron_task.sh") | crontab -
 
 # 启动 cron 服务
-# cron
+cron
 
 # 保持容器运行
 tail -f /var/log/cron.log
